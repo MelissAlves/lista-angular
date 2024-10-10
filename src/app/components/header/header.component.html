@@ -1,0 +1,21 @@
+<header class="app-header" [ngClass]="{ 'dark-mode': isDarkMode }">
+  <div class="left-section">
+    <div class="app-title">
+      <img [src]="isDarkMode ? 'assets/logo_light.gif' : 'assets/logo_dark.png'" alt="Logo" style="width: 150px;">
+    </div>
+  </div>
+  <div class="right-section">
+    <button class="toggle-mode-btn" (click)="toggleDarkMode()" aria-label="Alternar modo escuro/claro">
+      <img [src]="isDarkMode ? 'assets/brilho.png' : 'assets/moon-icon.png'" alt="Toggle Mode" class="toggle-icon"  />
+    </button>
+    <div class="user-profile">
+      <div class="user-info">
+        <img src="assets/avatar-perfil.jpg" alt="Avatar" class="user-icon">
+        <span class="user-name">{{ userName }}</span>
+      </div>
+    </div>
+    <button mat-icon-button aria-label="Sair" class="logout-btn" (click)="deslogar()">
+      <mat-icon class="logout-icon">open_in_new</mat-icon>
+    </button>
+  </div>
+</header>

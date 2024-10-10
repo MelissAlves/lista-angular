@@ -1,0 +1,39 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "name": "Melissa Alves",
+      "email": "melissa@gmail.com",
+      "password": "123Meliss@",
+      "token": "0001"
+    },
+    {
+      "id": 2,
+      "name": "Alexandre Mita",
+      "email": "mita@arctica.com",
+      "password": "Arctica@1",
+      "token": "0002"
+    },
+    {
+      "id": 3,
+      "name": "Cristiano Maia",
+      "email": "cristiano@arctica.com",
+      "password": "Arctica@12",
+      "token": "0003"
+    },
+    {
+      "id": 306793058659,
+      "name": "Teste de funcionalidade",
+      "email": "teste@arctica.com",
+      "password": "Teste123@",
+      "token": "w6fpglanswl"
+    },
+    {
+      "id": 123376563941,
+      "name": "Manu",
+      "email": "manu@teste.com",
+      "password": "Teste@123",
+      "token": "mue8fhmbyuq"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+<app-header></app-header>
+
+<div class="container">
+  <div class="table-container">
+    <div class="page-header">
+      <span>Login</span> &gt; Lista de Tarefas
+    </div>
+    <h1>Lista de Tarefas</h1>
+    <button class="btn-create-task" [routerLink]="['/task/new']">Criar Tarefa</button>
+    <div class="filter-section">
+      <div class="table-section">
+        <div class="search-section">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Pesquisar"
+            [(ngModel)]="searchTerm"
+            (keyup)="searchTable()" />
+          <button class="btn-search" (click)="searchTable()" aria-label="Pesquisar">
+            <img src="assets/pesquisa.png" alt="Ícone de pesquisa">
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Tarefa</th>
+              <th>Responsável</th>
+              <th>Data de Atualização</th>
+              <th>Data de Término Previsto</th>
+              <th>Status</th>
+              <th>Editar</th>
+              <th>Excluir</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let lista of paginatedList">
+              <td>{{ lista.name }}</td>
+              <td>{{ lista.updatedBy }}</td>
+              <td>{{ lista.updateDate | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ lista.endDate | date: 'dd/MM/yyyy' }}</td>
+              <td>
+                <div class="status">
+                  <span [ngClass]="{
+                    'status-activated': lista.status === 'Concluida',
+                    'status-deactivated': lista.status === 'Cancelada',
+                    'status-warning': lista.status === 'Em andamento'
+                  }">
+                    {{ lista.status }}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <button [routerLink]="['/task', lista.id, 'edit']" aria-label="Editar">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+              </td>
+              <td>
+                <button (click)="openDialog(lista)" aria-label="Excluir">
+                  <i class="fa-solid fa-trash icon-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="noResultsFound" class="no-results-message">
+          <img src="assets/atencao.png" alt="Erro" class="no-results-icon">
+          <p class="no-results-text">Desculpe, não encontramos resultados. Por favor, tente outra opção.</p>
+        </div>
+
+        <div class="pagination">
+          <div class="pagination-info">
+            <p>Itens por página: {{ itemsPerPage }} - {{ currentPage }} - {{ totalItems }}</p>
+          </div>
+          <div class="pagination-controls">
+            <button (click)="goToPreviousPage()" [disabled]="currentPage === 1">&lt;</button>
+            <button (click)="goToNextPage()" [disabled]="currentPage === totalPages">&gt;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

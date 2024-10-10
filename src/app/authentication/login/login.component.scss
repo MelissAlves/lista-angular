@@ -1,0 +1,177 @@
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  font-family: 'Open Sans', sans-serif;
+  flex-direction: column;
+}
+
+.container .container-login {
+  width: 960px;
+  display: flex;
+  height: 500px;
+}
+
+.container .container-login-two {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.container .container-login h2 {
+  font-size: 30px;
+}
+
+.container .container-login .area-de-login {
+  width: 40%;
+  background: #5874af;
+  border-radius: 15px 0px 0px 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.container .container-login .area-de-login-two {
+  border-radius: 0px 15px 15px 0px;
+}
+
+.container .container-login .area-de-login .primeiro-titulo, .subtitulo{
+  color: #fff;
+}
+
+.container .container-login .area-de-login .subtitulo{
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 0px;
+}
+
+.container .container-login .botao-entrar {
+  font-size: 10px;
+  padding: 10px 50px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 150px;
+  align-self: center;
+  border: none;
+  margin-top: 1rem;
+  background-color: #5874af;
+  border: 1px solid #5874af;
+  border-radius: 15px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.container .container-login .botao-entrar:hover {
+  background-color: #fff;
+  color: #5874af;
+  cursor: pointer;
+}
+
+.container .container-login .criar-login {
+  width: 60%;
+  background: #fff;
+  border-radius: 0px 15px 15px 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.container .container-login .criar-login-two {
+  border-radius: 15px 0px 0px 15px;
+}
+
+.container .container-login .criar-login .segundo-titulo {
+  color: #5874af;
+}
+
+.container .container-login .criar-login .p-titulo2 {
+  color: #7f8c8d;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 30px;
+}
+
+.container .container-login .criar-login .icones-gerais {
+  display: flex;
+  gap: 10px;
+}
+
+.container .container-login .criar-login .form {
+  display: flex;
+  flex-direction: column;
+  width: 55%;
+}
+
+
+.container .container-login .criar-login .form .form-login {
+  background-color: #ecf0f1;
+  display: flex;
+  align-items: center;
+  margin: 8px;
+  padding-left: 4px;
+  height: 45px;
+  color: #7f8c8d;
+  border: solid 1px #ecf0f1;
+
+}
+
+
+.container .container-login .criar-login .form input {
+  background-color: #ecf0f1;
+  margin: 8px;
+  width: 100%;
+  border: none;
+  height: 45px;
+}
+
+.container .container-login .criar-login .form span {
+  font-size: 14px;
+  font-family: 'Open Sans' sans-serif;
+  color: red;
+  padding-left: 12px;
+}
+
+.container .container-login .criar-login .form .botao-form {
+  font-size: 10px;
+  padding: 10px 50px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 150px;
+  align-self: center;
+  border: none;
+  margin-top: 1rem;
+  background-color: #5874af;
+  border: 1px solid #5874af;
+  border-radius: 15px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.container .container-login .criar-login .form .botao-form:hover {
+  cursor: pointer;
+  background-color: #fff;
+  border: 1px solid #5874af;
+  color: #5874af;
+}
+
+.container .container-login-two .form h4 {
+  color: #34495e;
+  font-size: 14px;
+  text-align: center;
+  text-decoration: underline;
+  font-style: italic;
+  margin: 0px;
+}
+
+.container .container-login.erro-multiplo .criar-login .segundo-titulo {
+  margin-bottom: 10px;
+}
+
+.container .container-login.erro-multiplo .criar-login .form .botao-form,
+.container .container-login.erro-multiplo .botao-entrar {
+  margin-top: 5px;
+}

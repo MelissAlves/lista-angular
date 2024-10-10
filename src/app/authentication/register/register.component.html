@@ -1,0 +1,52 @@
+<div class="container">
+  <div class="container-login" [ngClass]="{'erro-multiplo': formularioHasErrors()}">
+    <div class="area-de-login">
+      <img src="https://arctica.com.br/wp-content/uploads/2024/07/equipe_1_3.png" alt="Equipe" class="login-image">
+    </div>
+    <div class="criar-login">
+      <h2 class="segundo-titulo">Registra-se</h2>
+      <form class="form" (ngSubmit)="cadastrar()" [formGroup]="formulario">
+
+        <label  class="form-login" for="name">
+          <i class="far fa-user icon-modify"></i>
+          <input type="text" id="name" placeholder="Nome" formControlName="name">
+        </label>
+        <span *ngIf="(formulario.get('name')?.touched || submetido) && formulario.get('name')?.errors?.['required']">
+          Campo obrigatório
+        </span>
+
+        <label class="form-login" for="email">
+          <i class="far fa-envelope icon-modify"></i>
+          <input type="text" id="email" placeholder="E-mail" formControlName="email">
+        </label>
+        <span *ngIf="(formulario.get('email')?.touched || submetido) && formulario.get('email')?.errors?.['required']">
+          Campo obrigatório
+        </span>
+        <span *ngIf="formulario.get('email')?.touched && formulario.get('email')?.status === 'INVALID'">
+          Deve ser um e-mail válido
+        </span>
+
+        <label class="form-login" for="senha">
+          <i class="fas fa-lock icon-modify"></i>
+          <input type="password" id="password" placeholder="Senha" formControlName="password">
+        </label>
+        <span *ngIf="(formulario.get('password')?.touched || submetido) && formulario.get('password')?.errors?.['required']">
+          Campo obrigatório
+        </span>
+        <span *ngIf="formulario.get('password')?.touched && formulario.get('password')?.status === 'INVALID'">
+          A senha deve ter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 minúscula, 1 número e 1 caracter especial
+        </span>
+        <label class="form-login" for="passwordConfirm">
+          <i class="fas fa-lock icon-modify"></i>
+          <input type="password" id="passwordConfirm" placeholder="Confirmar Senha" formControlName="passwordConfirm">
+        </label>
+        <span *ngIf="(formulario.get('passwordConfirm')?.touched || submetido) && formulario.get('passwordConfirm')?.errors?.['required']">
+          Campo obrigatório
+        </span>
+        <br>
+        <button class="botao-form" type="submit">Registrar</button>
+        <button class="botao-entrar" [routerLink]="['/login']">Login</button>
+      </form>
+    </div>
+  </div>
+</div>

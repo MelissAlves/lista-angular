@@ -1,0 +1,83 @@
+<app-header></app-header>
+<div class="container">
+  <header class="header">
+    <h1><a [routerLink]="['/task']">Voltar</a></h1>
+    <h2>{{ isEditMode ? 'Editar Tarefa' : 'Adicionar Tarefa' }}</h2>
+  </header>
+  <section class="form-section">
+    <form (ngSubmit)="onSubmit()" #taskForm="ngForm">
+      <div class="form-group">
+        <label for="name">Tarefa</label>
+        <input type="text" id="name" name="name" [(ngModel)]="task.name" required maxlength="70"
+               [ngClass]="{'is-invalid': taskForm.submitted && !task.name}">
+        <div *ngIf="taskForm.submitted && !task.name" class="error-message">
+          Tarefa é obrigatória.
+        </div>
+        <div *ngIf="taskForm.submitted && task.name.length > 70" class="error-message">
+          A tarefa deve ter no máximo 70 caracteres.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="updatedBy">Responsável</label>
+        <input type="text" id="updatedBy" name="updatedBy" [(ngModel)]="task.updatedBy" required maxlength="50"
+        [ngClass]="{'is-invalid': taskForm.submitted && !task.updatedBy}">
+        <div *ngIf="taskForm.submitted && !task.updatedBy" class="error-message">
+          Responsável é obrigatório.
+        </div>
+        <div *ngIf="taskForm.submitted && task.updatedBy.length > 50" class="error-message">
+          O responsável deve ter no máximo 50 caracteres.
+        </div>
+      </div>
+
+      <div class="form-group date-group">
+        <div class="form-group">
+          <label for="status">Status</label>
+          <mat-form-field appearance="outline">
+            <mat-label>Selecione o Status</mat-label>
+            <mat-select name="status" [(ngModel)]="task.status" required
+                        [ngClass]="{'is-invalid': taskForm.submitted && !task.status}">
+              <mat-option value="Em andamento">Em andamento</mat-option>
+              <mat-option value="Cancelada">Cancelada</mat-option>
+              <mat-option value="Concluida">Concluida</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div *ngIf="taskForm.submitted && !task.status" class="error-message">
+            O status é obrigatório.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="endDate">Data de Término Previsto:</label>
+          <mat-form-field appearance="fill">
+            <input matInput [matDatepicker]="endDatePicker" placeholder="Escolha uma data" name="endDate" [(ngModel)]="task.endDate" required
+                   [ngClass]="{'is-invalid': taskForm.submitted && !task.endDate}">
+            <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #endDatePicker></mat-datepicker>
+          </mat-form-field>
+          <div *ngIf="taskForm.submitted && !task.endDate" class="error-message">
+            A data de término é obrigatória.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="updateDate">Data de Criação:</label>
+          <mat-form-field appearance="fill" class="background-select">
+            <input matInput [matDatepicker]="createDatePicker" placeholder="Escolha uma data" name="updateDate" [(ngModel)]="task.updateDate" required
+                   [ngClass]="{'is-invalid': taskForm.submitted && !task.updateDate}">
+            <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #createDatePicker></mat-datepicker>
+          </mat-form-field>
+          <div *ngIf="taskForm.submitted && !task.updateDate" class="error-message">
+            A data de criação é obrigatória.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="onCancel()">Cancelar</button>
+        <button type="submit" class="save-btn">{{ isEditMode ? 'Salvar Alterações' : 'Salvar' }}</button>
+      </div>
+    </form>
+  </section>
+</div>
