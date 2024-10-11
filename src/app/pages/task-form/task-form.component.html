@@ -32,6 +32,30 @@
 
       <div class="form-group date-group">
         <div class="form-group">
+          <label for="updateDate">Data de Criação:</label>
+          <mat-form-field appearance="fill" class="background-select">
+            <input matInput [matDatepicker]="createDatePicker" placeholder="Escolha uma data" name="updateDate" [(ngModel)]="task.updateDate" required
+                   [ngClass]="{'is-invalid': taskForm.submitted && !task.updateDate}">
+            <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #createDatePicker></mat-datepicker>
+          </mat-form-field>
+          <div *ngIf="taskForm.submitted && !task.updateDate" class="error-message">
+            A data de criação é obrigatória.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="endDate">Data de Término Previsto:</label>
+          <mat-form-field appearance="fill">
+            <input matInput [matDatepicker]="endDatePicker" placeholder="Escolha uma data" name="endDate" [(ngModel)]="task.endDate" required
+                   [ngClass]="{'is-invalid': taskForm.submitted && !task.endDate}">
+            <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #endDatePicker></mat-datepicker>
+          </mat-form-field>
+          <div *ngIf="taskForm.submitted && !task.endDate" class="error-message">
+            A data de término é obrigatória.
+          </div>
+        </div>
+        <div class="form-group">
           <label for="status">Status</label>
           <mat-form-field appearance="outline">
             <mat-label>Selecione o Status</mat-label>
@@ -46,34 +70,7 @@
             O status é obrigatório.
           </div>
         </div>
-
-        <div class="form-group">
-          <label for="endDate">Data de Término Previsto:</label>
-          <mat-form-field appearance="fill">
-            <input matInput [matDatepicker]="endDatePicker" placeholder="Escolha uma data" name="endDate" [(ngModel)]="task.endDate" required
-                   [ngClass]="{'is-invalid': taskForm.submitted && !task.endDate}">
-            <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker #endDatePicker></mat-datepicker>
-          </mat-form-field>
-          <div *ngIf="taskForm.submitted && !task.endDate" class="error-message">
-            A data de término é obrigatória.
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="updateDate">Data de Criação:</label>
-          <mat-form-field appearance="fill" class="background-select">
-            <input matInput [matDatepicker]="createDatePicker" placeholder="Escolha uma data" name="updateDate" [(ngModel)]="task.updateDate" required
-                   [ngClass]="{'is-invalid': taskForm.submitted && !task.updateDate}">
-            <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker #createDatePicker></mat-datepicker>
-          </mat-form-field>
-          <div *ngIf="taskForm.submitted && !task.updateDate" class="error-message">
-            A data de criação é obrigatória.
-          </div>
-        </div>
       </div>
-
       <div class="form-actions">
         <button type="button" class="cancel-btn" (click)="onCancel()">Cancelar</button>
         <button type="submit" class="save-btn">{{ isEditMode ? 'Salvar Alterações' : 'Salvar' }}</button>

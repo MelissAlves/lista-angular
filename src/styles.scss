@@ -63,6 +63,10 @@ body.dark-mode .logout-icon {
   background-color:rgba(252, 255, 247, 0.952);
 }
 
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color:rgba(252, 255, 247, 0.952) !important;
+}
+
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
 
