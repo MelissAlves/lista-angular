@@ -7,7 +7,7 @@ import { ListaInterface } from '../models/lista-tarefa';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiList = 'http://localhost:3000/lista'
+  private apiList = 'http://localhost:3000/lista';
 
   constructor(private http: HttpClient) { }
 
@@ -19,16 +19,16 @@ export class AuthService {
     return this.http.get<ListaInterface[]>(this.apiList);
   }
 
-  // Obter uma tarefa específica usando a query string
   getTarefaPorId(id: number): Observable<ListaInterface> {
-    return this.http.get<ListaInterface>(`${this.apiList}?id=${id}`);
+    return this.http.get<ListaInterface>(`${this.apiList}/${id}`);
   }
 
   deletarTarefa(id: number) {
-    return this.http.delete<ListaInterface>(`${this.apiList}/${id}`);
+    // Usando query string para deletar
+    return this.http.delete<ListaInterface>(`${this.apiList}?id=${id}`);
   }
 
   editarTarefa(lista: ListaInterface) {
-    return this.http.put<ListaInterface>(`${this.apiList}?id=${lista.id}`, lista);
+    return this.http.put<ListaInterface>(`${this.apiList}/${lista.id}`, lista);
   }
 }

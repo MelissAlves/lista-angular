@@ -11,7 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class TaskFormComponent implements OnInit {
   task: ListaInterface = {
-    id: 0, // Inicialize como 0, será atualizado ao criar
+    id: 0,
     name: '',
     updatedBy: '',
     updateDate: new Date(),
@@ -37,7 +37,7 @@ export class TaskFormComponent implements OnInit {
         const taskToEdit = lista.find(task => task.id === Number(taskId));
         if (taskToEdit) {
           this.task = { ...taskToEdit };
-          console.log('Tarefa encontrada:', taskToEdit); // Mostra a tarefa encontrada
+          console.log('Tarefa encontrada:', taskToEdit);
         } else {
           console.log('Tarefa não encontrada');
         }
