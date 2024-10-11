@@ -11,7 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class TaskFormComponent implements OnInit {
   task: ListaInterface = {
-    id: 0,
+    id: '',
     name: '',
     updatedBy: '',
     updateDate: new Date(),
@@ -34,7 +34,7 @@ export class TaskFormComponent implements OnInit {
       this.isEditMode = true;
       this.authService.getLista().subscribe((lista: ListaInterface[]) => {
         console.log('Lista de Tarefas:', lista);
-        const taskToEdit = lista.find(task => task.id === Number(taskId));
+        const taskToEdit = lista.find(task => String(task.id) === taskId);
         if (taskToEdit) {
           this.task = { ...taskToEdit };
           console.log('Tarefa encontrada:', taskToEdit);
@@ -50,11 +50,10 @@ export class TaskFormComponent implements OnInit {
       return;
     }
 
-    // Atribuir novo ID se não estiver em modo de edição
     if (!this.isEditMode) {
       this.authService.getLista().subscribe((lista: ListaInterface[]) => {
-        const existingIds = lista.map(task => task.id);
-        this.task.id = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1; // Atribuir novo ID
+        const existingIds = lista.map(task => Number(task.id));
+        this.task.id = (existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1).toString();
         this.saveTask();
       });
     } else {
@@ -68,10 +67,18 @@ export class TaskFormComponent implements OnInit {
       : this.authService.adicionarLista(this.task);
 
     saveTask$.subscribe(() => {
-      this.showSnackBar('Tarefa criada com sucesso!', 'Fechar');
+      if (this.isEditMode) {
+        this.showSnackBar('Tarefa editada com sucesso!', 'Fechar');
+      } else {
+        this.showSnackBar('Tarefa criada com sucesso!', 'Fechar');
+      }
       this.router.navigate(['/task']);
     }, (error) => {
-      this.showSnackBar('Erro ao criar a tarefa: ' + error.message, 'Fechar');
+      if (this.isEditMode) {
+        this.showSnackBar('Erro ao editar a tarefa: ' + error.message, 'Fechar');
+      } else {
+        this.showSnackBar('Erro ao criar a tarefa: ' + error.message, 'Fechar');
+      }
     });
   }
 

@@ -1,11 +1,11 @@
 <div class="container">
   <div class="container-login" [ngClass]="{'erro-multiplo': formularioHasErrors()}">
-    <div class="area-de-login">
+    <div class="area-login">
       <img src="https://arctica.com.br/wp-content/uploads/2024/07/equipe_1_3.png" alt="Equipe" class="login-image">
     </div>
     <div class="criar-login">
-      <h2 class="segundo-titulo">Registra-se</h2>
-      <form class="form" (ngSubmit)="cadastrar()" [formGroup]="formulario">
+      <h2 class="titulo">Registra-se</h2>
+      <form class="form" (ngSubmit)="registrar()" [formGroup]="formulario">
 
         <label  class="form-login" for="name">
           <i class="far fa-user icon-modify"></i>

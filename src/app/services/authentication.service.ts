@@ -11,7 +11,7 @@ export class AuthenticationService {
 
   constructor(private http: HttpClient) {}
 
-  cadastrar(usuario: Login) {
+  registrar(usuario: Login) {
     usuario.token = Math.random().toString(36).substring(2);
     return this.http.post<Login>(this.apLogin, usuario);
   }

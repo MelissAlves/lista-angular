@@ -42,10 +42,10 @@ export class RegisterComponent {
     if ((this.formulario.get('passwordConfirm')?.touched || this.submetido) && this.formulario.get('passwordConfirm')?.errors?.['required']) {
       errors++;
     }
-    return errors > 0; // Alterado para retornar true se houver erros
+    return errors > 0;
   }
 
-  cadastrar(): void {
+  registrar(): void {
     console.log(this.formulario.controls);
     this.submetido = true;
 
@@ -57,16 +57,16 @@ export class RegisterComponent {
         name: form.name,
         email: form.email,
         password: form.password,
-        token: Math.random().toString(36).substring(2) // Gerando o token aqui também
+        token: Math.random().toString(36).substring(2)
       };
 
-      this.service.cadastrar(usuario).subscribe({
+      this.service.registrar(usuario).subscribe({
         next: () => {
           this.router.navigateByUrl("/login");
         },
         error: (err) => {
-          console.error('Erro ao cadastrar usuário:', err);
-          this.snackBar.open('Erro ao cadastrar usuário. Tente novamente!', 'Fechar', {
+          console.error('Erro ao registrar usuário:', err);
+          this.snackBar.open('Erro ao registrar usuário. Tente novamente!', 'Fechar', {
             duration: 5000,
             horizontalPosition: 'center',
             verticalPosition: 'top',

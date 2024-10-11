@@ -18,7 +18,7 @@ export class HeaderComponent {
   ) {
     this.userName = this.authenticationService.obterUsuarioLogado() || 'Usuário Desconhecido';
 
-    // Verificar o estado inicial do modo no localStorage
+    // Verificar o estado inicial
     const savedMode = localStorage.getItem('darkMode');
     this.isDarkMode = savedMode === 'true';
 
@@ -31,7 +31,7 @@ export class HeaderComponent {
   toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
 
-    // Salvar a preferência do usuário no localStorage
+    // Salvar a preferência do usuário
     localStorage.setItem('darkMode', this.isDarkMode.toString());
 
     if (this.isDarkMode) {

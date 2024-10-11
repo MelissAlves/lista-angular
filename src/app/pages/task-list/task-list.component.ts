@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar'; // Adicionado
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ModalComponent } from '../../components/modal/modal.component';
 import { AuthService } from '../../services/auth.service';
 import { ListaInterface } from '../../models/lista-tarefa';
@@ -16,11 +16,11 @@ export class TaskListComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar // Adicionado
+    private snackBar: MatSnackBar
   ) {}
 
   listas: ListaInterface[] = [];
-  filteredListas: ListaInterface[] = []; // Lista filtrada para exibição
+  filteredListas: ListaInterface[] = [];
   searchTerm = '';
   itemsPerPage = 5;
   currentPage = 1;
@@ -30,11 +30,11 @@ export class TaskListComponent implements OnInit {
   ngOnInit(): void {
     this.authService.getLista().subscribe(
       (data) => {
-        if (data && Array.isArray(data)) { // Verifique se data é um array
-          this.listas = data; // Atribua diretamente se for um array
+        if (data && Array.isArray(data)) {
+          this.listas = data;
         } else {
           console.warn('A lista está vazia ou não é um array:', data);
-          this.listas = []; // Caso não seja um array, inicialize como um array vazio
+          this.listas = [];
         }
         this.filteredListas = [...this.listas];
         this.totalItems = this.filteredListas.length;
@@ -47,7 +47,7 @@ export class TaskListComponent implements OnInit {
 
   searchTable(): void {
     if (this.searchTerm.trim() === '') {
-      this.filteredListas = [...this.listas]; // Restaura a lista original
+      this.filteredListas = [...this.listas];
       this.noResultsFound = false;
     } else {
       this.filteredListas = this.listas.filter(lista =>
@@ -110,28 +110,25 @@ export class TaskListComponent implements OnInit {
     });
   }
 
-  deleteList(id: number): void {
+  deleteList(id: string): void {
     this.authService.deletarTarefa(id).subscribe(
       () => {
-        // Se a exclusão for bem-sucedida
         this.listas = this.listas.filter(lista => lista.id !== id);
         this.filteredListas = this.filteredListas.filter(lista => lista.id !== id);
         this.totalItems = this.filteredListas.length;
         this.showSnackBar('Item excluído com sucesso!', 'Fechar');
       },
       error => {
-        // Se ocorrer um erro na exclusão
-        console.error('Erro ao excluir a lista:', error);
-        this.showSnackBar('Erro ao excluir o item. Tente novamente.', 'Fechar');
+        this.showSnackBar('Erro ao excluir a tarefa. Tente novamente.', 'Fechar');
       }
     );
   }
 
   showSnackBar(message: string, action: string) {
     this.snackBar.open(message, action, {
-      duration: 3000, // duração do alerta em milissegundos
-      verticalPosition: 'top', // posição vertical
-      horizontalPosition: 'center' // posição horizontal
+      duration: 3000,
+      verticalPosition: 'top',
+      horizontalPosition: 'center'
     });
   }
 }

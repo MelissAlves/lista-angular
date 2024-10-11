@@ -59,6 +59,10 @@ body.dark-mode .logout-icon {
   margin-top: 5px;
 }
 
+.mat-mdc-form-field-type-mat-select:not(.mat-form-field-disabled) .mat-mdc-text-field-wrapper {
+  background-color:rgba(252, 255, 247, 0.952);
+}
+
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
 

@@ -15,7 +15,7 @@
   height: 500px;
 }
 
-.container .container-login-two {
+.container .container-login-right {
   display: flex;
   flex-direction: row-reverse;
 }
@@ -24,7 +24,7 @@
   font-size: 30px;
 }
 
-.container .container-login .area-de-login {
+.container .container-login .area-login {
   width: 40%;
   background: #5874af;
   border-radius: 15px 0px 0px 15px;
@@ -34,15 +34,15 @@
   flex-direction: column;
 }
 
-.container .container-login .area-de-login-two {
+.container .container-login .area-login-right {
   border-radius: 0px 15px 15px 0px;
 }
 
-.container .container-login .area-de-login .primeiro-titulo, .subtitulo{
+.container .container-login .area-login .primeiro-titulo, .subtitulo{
   color: #fff;
 }
 
-.container .container-login .area-de-login .subtitulo{
+.container .container-login .area-login .subtitulo{
   font-size: 14px;
   font-weight: 300;
   line-height: 0px;
@@ -84,11 +84,11 @@
   border-radius: 15px 0px 0px 15px;
 }
 
-.container .container-login .criar-login .segundo-titulo {
+.container .container-login .criar-login .titulo {
   color: #5874af;
 }
 
-.container .container-login .criar-login .p-titulo2 {
+.container .container-login .criar-login .p-titulo {
   color: #7f8c8d;
   font-size: 14px;
   font-weight: 300;
@@ -158,7 +158,7 @@
   color: #5874af;
 }
 
-.container .container-login-two .form h4 {
+.container .container-login-right .form h4 {
   color: #34495e;
   font-size: 14px;
   text-align: center;
@@ -167,7 +167,7 @@
   margin: 0px;
 }
 
-.container .container-login.erro-multiplo .criar-login .segundo-titulo {
+.container .container-login.erro-multiplo .criar-login .titulo {
   margin-bottom: 10px;
 }
 

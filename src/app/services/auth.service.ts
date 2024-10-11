@@ -11,7 +11,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
-  adicionarLista(lista: ListaInterface) {
+  adicionarLista(lista: ListaInterface): Observable<ListaInterface> {
     return this.http.post<ListaInterface>(this.apiList, lista);
   }
 
@@ -19,16 +19,15 @@ export class AuthService {
     return this.http.get<ListaInterface[]>(this.apiList);
   }
 
-  getTarefaPorId(id: number): Observable<ListaInterface> {
+  getTarefaPorId(id: string): Observable<ListaInterface> {
     return this.http.get<ListaInterface>(`${this.apiList}/${id}`);
   }
 
-  deletarTarefa(id: number) {
-    // Usando query string para deletar
-    return this.http.delete<ListaInterface>(`${this.apiList}?id=${id}`);
+  deletarTarefa(id: string): Observable<ListaInterface> {
+    return this.http.delete<ListaInterface>(`${this.apiList}/${id}`);
   }
 
-  editarTarefa(lista: ListaInterface) {
+  editarTarefa(lista: ListaInterface): Observable<ListaInterface> {
     return this.http.put<ListaInterface>(`${this.apiList}/${lista.id}`, lista);
   }
 }
