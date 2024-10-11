@@ -1,49 +1,66 @@
-import { Login } from './login';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
+import { Router } from '@angular/router';
+import { of } from 'rxjs';
+import { LoginComponent } from '../authentication/login/login.component';
+import { AuthenticationService } from '../services/authentication.service';
 
-describe('Login Interface', () => {
-  it('should create a valid Login object', () => {
-    const login: Login = {
-      id: 1,
-      name: 'Usuário Exemplo',
-      email: 'usuario@example.com',
-      password: 'senha123@',
-      token: 'abc123xyz' // token é opcional
-    };
+describe('LoginComponent', () => {
+  let component: LoginComponent;
+  let fixture: ComponentFixture<LoginComponent>;
+  let authService: jasmine.SpyObj<AuthenticationService>;
+  let router: Router;
 
-    expect(login.id).toEqual(1);
-    expect(login.name).toEqual('Usuário Exemplo');
-    expect(login.email).toEqual('usuario@example.com');
-    expect(login.password).toEqual('senha123@');
-    expect(login.token).toEqual('abc123xyz');
+  beforeEach(async () => {
+    const authSpy = jasmine.createSpyObj('AuthenticationService', ['login']);
+
+    await TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, RouterTestingModule],
+      declarations: [LoginComponent],
+      providers: [
+        { provide: AuthenticationService, useValue: authSpy }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(LoginComponent);
+    component = fixture.componentInstance;
+    authService = TestBed.inject(AuthenticationService) as jasmine.SpyObj<AuthenticationService>;
+    router = TestBed.inject(Router);
+
+    fixture.detectChanges();
   });
 
-  it('should allow creation without token', () => {
-    const login: Login = {
-      id: 2,
-      name: 'Outro Usuário',
-      email: 'outro.usuario@example.com',
-      password: 'senha456@'
-    };
-
-    expect(login.id).toEqual(2);
-    expect(login.name).toEqual('Outro Usuário');
-    expect(login.email).toEqual('outro.usuario@example.com');
-    expect(login.password).toEqual('senha456');
-    expect(login.token).toBeUndefined();
+  it('should create', () => {
+    expect(component).toBeTruthy();
   });
 
-  it('should have the correct types', () => {
-    const login: Login = {
-      id: 3,
-      name: 'Usuário Teste',
-      email: 'teste@exemplo.com',
-      password: 'senha789@'
-    };
+  it('should not submit if the form is invalid', () => {
+    component.formLogar.controls['email'].setValue('');
+    component.formLogar.controls['password'].setValue('');
+    component.logar();
+    expect(component.submetido).toBeTrue();
+    expect(authService.login).not.toHaveBeenCalled();
+  });
 
-    expect(typeof login.id).toBe('number');
-    expect(typeof login.name).toBe('string');
-    expect(typeof login.email).toBe('string');
-    expect(typeof login.password).toBe('string');
-    expect(typeof login.token).toBe('undefined');
+  it('should submit and navigate on successful login', () => {
+    component.formLogar.controls['email'].setValue('teste@teste.com');
+    component.formLogar.controls['password'].setValue('senha123');
+
+    authService.login.and.returnValue(of(true)); // exemplo de login certo
+    component.logar();
+
+    expect(authService.login).toHaveBeenCalledWith('teste@teste.com', 'senha123');
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/task');
+  });
+
+  it('should show error on unsuccessful login', () => {
+    component.formLogar.controls['email'].setValue('teste@teste.com');
+    component.formLogar.controls['password'].setValue('senha123');
+
+    authService.login.and.returnValue(of(false)); // exemplo de login errado
+    component.logar();
+
+    expect(component.mensagemErro).toBe('Usuário ou password inválido');
   });
 });

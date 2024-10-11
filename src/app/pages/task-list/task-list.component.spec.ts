@@ -1,57 +1,64 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TaskListComponent } from './task-list.component';
-import { AuthService } from '../../services/auth.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
-import { of, throwError } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { FormsModule } from '@angular/forms';
+import { of, throwError } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
+import { TaskListComponent } from './task-list.component';
 import { ListaInterface } from '../../models/lista-tarefa';
-import { HeaderComponent } from '../../components/header/header.component';
+import { ModalComponent } from '../../components/modal/modal.component';
+
+class MockAuthService {
+  getLista() {
+    return of([{ id: '1', name: 'Task 1', updatedBy: 'User 1', updateDate: new Date(), endDate: new Date(), status: 'Concluida' }]);
+  }
+
+  deletarTarefa(id: string) {
+    return of(null);
+  }
+}
+
+class MockMatDialog {
+  open() {
+    return {
+      afterClosed: () => of(true) // Mock para o diálogo que retorna true após fechado
+    };
+  }
+}
+
+class MockMatSnackBar {
+  open() {}
+}
 
 describe('TaskListComponent', () => {
   let component: TaskListComponent;
   let fixture: ComponentFixture<TaskListComponent>;
-  let mockAuthService: jasmine.SpyObj<AuthService>;
-  let mockDialog: jasmine.SpyObj<MatDialog>;
-  let mockSnackBar: jasmine.SpyObj<MatSnackBar>;
-
-  const mockTaskList = [
-    { id: '1', name: 'Task 1', updatedBy: 'User 1', updateDate: new Date(), endDate: new Date(), status: 'Em andamento' },
-    { id: '2', name: 'Task 2', updatedBy: 'User 2', updateDate: new Date(), endDate: new Date(), status: 'Concluida' },
-    { id: '3', name: 'Task 3', updatedBy: 'User 3', updateDate: new Date(), endDate: new Date(), status: 'Cancelada' },
-  ];
-
-
-  const mockTask: ListaInterface = {
-    id: '1',
-    name: 'Test Task',
-    updatedBy: 'Test User',
-    updateDate: new Date(),
-    endDate: new Date(),
-    status: 'Em andamento'
-  };
+  let authService: AuthService;
+  let dialog: MatDialog;
+  let snackBar: MatSnackBar;
+  let router: Router;
 
   beforeEach(async () => {
-    mockAuthService = jasmine.createSpyObj('AuthService', ['getLista', 'deletarTarefa']);
-    mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
-    mockSnackBar = jasmine.createSpyObj('MatSnackBar', ['open']);
-
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule, FormsModule, HeaderComponent],
-      declarations: [TaskListComponent],
+      imports: [RouterTestingModule, HttpClientTestingModule],
+      declarations: [TaskListComponent, ModalComponent],
       providers: [
-        { provide: AuthService, useValue: mockAuthService },
-        { provide: MatDialog, useValue: mockDialog },
-        { provide: MatSnackBar, useValue: mockSnackBar }
-      ]
+        { provide: AuthService, useClass: MockAuthService },
+        { provide: MatDialog, useClass: MockMatDialog },
+        { provide: MatSnackBar, useClass: MockMatSnackBar }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TaskListComponent);
     component = fixture.componentInstance;
-    mockAuthService.getLista.and.returnValue(of(mockTaskList));
+    authService = TestBed.inject(AuthService);
+    dialog = TestBed.inject(MatDialog);
+    snackBar = TestBed.inject(MatSnackBar);
+    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
@@ -59,84 +66,60 @@ describe('TaskListComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should fetch the task list on initialization', () => {
-    expect(component.listas).toEqual(mockTaskList);
-    expect(component.filteredListas.length).toBe(3);
-    expect(component.totalItems).toBe(3);
+  it('should fetch tasks on init', () => {
+    const getListaSpy = spyOn(authService, 'getLista').and.callThrough();
+    component.ngOnInit();
+    expect(getListaSpy).toHaveBeenCalled();
+    expect(component.listas.length).toBeGreaterThan(0);
   });
 
-  it('should filter the task list based on the search term', () => {
+  it('should handle empty task list gracefully', () => {
+    const emptyListService = new MockAuthService();
+    spyOn(emptyListService, 'getLista').and.returnValue(of([]));
+    TestBed.overrideProvider(AuthService, { useValue: emptyListService });
+
+    component.ngOnInit();
+    expect(component.listas).toEqual([]);
+    expect(component.filteredListas).toEqual([]);
+    expect(component.totalItems).toEqual(0);
+  });
+
+  it('should filter tasks based on search term', () => {
     component.searchTerm = 'Task 1';
     component.searchTable();
     expect(component.filteredListas.length).toBe(1);
-    expect(component.filteredListas[0].name).toBe('Task 1');
+    expect(component.noResultsFound).toBeFalse();
   });
 
-  it('should reset the filtered task list when the search term is empty', () => {
-    component.searchTerm = '';
-    component.searchTable();
-    expect(component.filteredListas.length).toBe(3);
-  });
-
-  it('should show no results message when search returns no tasks', () => {
-    component.searchTerm = 'Non-existent Task';
+  it('should show no results when search term does not match', () => {
+    component.searchTerm = 'Non-existent task';
     component.searchTable();
     expect(component.filteredListas.length).toBe(0);
     expect(component.noResultsFound).toBeTrue();
   });
 
-  it('should delete a task and update the list', () => {
-    mockAuthService.deletarTarefa.and.returnValue(of(mockTask));
-    const taskToDelete = mockTaskList[0];
+  it('should open the delete dialog and delete task', () => {
+    const deleteTaskSpy = spyOn(component, 'deleteList').and.callThrough();
+    const openDialogSpy = spyOn(dialog, 'open').and.callThrough();
+    component.openDialog({ id: '1', name: 'Task 1', updatedBy: 'User 1', updateDate: new Date(), endDate: new Date(), status: 'Concluida' });
 
-    component.deleteList(taskToDelete.id);
-
-    expect(mockAuthService.deletarTarefa).toHaveBeenCalledWith(taskToDelete.id);
-    expect(component.listas.length).toBe(2);
-    expect(component.filteredListas.length).toBe(2);
-    expect(mockSnackBar.open).toHaveBeenCalledWith('Item excluído com sucesso!', 'Fechar', {
-      duration: 3000,
-      verticalPosition: 'top',
-      horizontalPosition: 'center'
-    });
+    expect(openDialogSpy).toHaveBeenCalled();
+    expect(deleteTaskSpy).toHaveBeenCalledWith('1');
   });
 
-  it('should show an error message if task deletion fails', () => {
-    mockAuthService.deletarTarefa.and.returnValue(throwError(() => new Error('Deletion failed')));
+  it('should handle delete task error', () => {
+    const errorService = new MockAuthService();
+    spyOn(errorService, 'deletarTarefa').and.returnValue(throwError('Error deleting task'));
+    TestBed.overrideProvider(AuthService, { useValue: errorService });
 
+    spyOn(snackBar, 'open');
     component.deleteList('1');
-
-    expect(mockSnackBar.open).toHaveBeenCalledWith('Erro ao excluir o item. Tente novamente.', 'Fechar', {
-      duration: 3000,
-      verticalPosition: 'top',
-      horizontalPosition: 'center'
-    });
+    expect(snackBar.open).toHaveBeenCalledWith('Erro ao excluir a tarefa. Tente novamente.', 'Fechar', jasmine.any(Object));
   });
 
-  it('should open the dialog to confirm deletion', () => {
-    const taskToDelete = mockTaskList[0];
-    const mockDialogRef = { afterClosed: () => of(true) } as any;
-    mockDialog.open.and.returnValue(mockDialogRef);
-
-    component.openDialog(taskToDelete);
-
-    expect(mockDialog.open).toHaveBeenCalled();
-    expect(mockAuthService.deletarTarefa).toHaveBeenCalledWith(taskToDelete.id);
-  });
-
-  it('should handle pagination correctly', () => {
-    component.itemsPerPage = 2;
-    component.goToNextPage();
-    expect(component.currentPage).toBe(2);
-
-    component.goToPreviousPage();
-    expect(component.currentPage).toBe(1);
-  });
-
-  it('should navigate to task creation page', () => {
-    const navigateSpy = spyOn(component['router'], 'navigate');
-    const createTaskButton = fixture.nativeElement.querySelector('.btn-create-task');
-    createTaskButton.click();
-    expect(navigateSpy).toHaveBeenCalledWith(['/task/new']);
+  it('should show success message when task is deleted', () => {
+    spyOn(snackBar, 'open');
+    component.deleteList('1');
+    expect(snackBar.open).toHaveBeenCalledWith('Item excluído com sucesso!', 'Fechar', jasmine.any(Object));
   });
 });

@@ -1,139 +1,180 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TaskFormComponent } from './task-form.component';
-import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { of, throwError } from 'rxjs';
-import { FormsModule } from '@angular/forms';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ListaInterface } from '../../models/lista-tarefa';
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-header',
-  template: ''
-})
-class MockHeaderComponent {}
+import { FormsModule } from '@angular/forms';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { TaskFormComponent } from './task-form.component';
+import { AuthService } from '../../services/auth.service';
 
 describe('TaskFormComponent', () => {
   let component: TaskFormComponent;
   let fixture: ComponentFixture<TaskFormComponent>;
-  let mockAuthService: jasmine.SpyObj<AuthService>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockSnackBar: jasmine.SpyObj<MatSnackBar>;
-  let mockActivatedRoute: any;
-
-  const mockTask: ListaInterface = {
-    id: '1',
-    name: 'Test Task',
-    updatedBy: 'Test User',
-    updateDate: new Date(),
-    endDate: new Date(),
-    status: 'Em andamento'
-  };
+  let authServiceStub: Partial<AuthService>;
+  let snackBarStub: Partial<MatSnackBar>;
+  let routerStub: Partial<Router>;
 
   beforeEach(async () => {
-    mockAuthService = jasmine.createSpyObj('AuthService', ['getLista', 'adicionarLista', 'editarTarefa']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockSnackBar = jasmine.createSpyObj('MatSnackBar', ['open']);
+    authServiceStub = {
+      getLista: () => of([]),
+      adicionarLista: () => of({} as ListaInterface),
+      editarTarefa: () => of({} as ListaInterface)
+    };
 
-    mockActivatedRoute = {
-      snapshot: {
-        paramMap: {
-          get: jasmine.createSpy('get').and.returnValue(null)
-        }
-      }
+    snackBarStub = {
+      open: jasmine.createSpy('open')
+    };
+
+    routerStub = {
+      navigate: jasmine.createSpy('navigate')
     };
 
     await TestBed.configureTestingModule({
-      imports: [FormsModule, MatSnackBarModule, BrowserAnimationsModule],
-      declarations: [TaskFormComponent, MockHeaderComponent],
+      declarations: [TaskFormComponent],
+      imports: [FormsModule, NoopAnimationsModule],
       providers: [
-        { provide: AuthService, useValue: mockAuthService },
-        { provide: Router, useValue: mockRouter },
-        { provide: MatSnackBar, useValue: mockSnackBar },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute }
-      ]
+        { provide: AuthService, useValue: authServiceStub },
+        { provide: MatSnackBar, useValue: snackBarStub },
+        { provide: Router, useValue: routerStub },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              paramMap: {
+                get: (key: string) => null
+              }
+            }
+          }
+        }
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TaskFormComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
-  it('should create the component', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize in add mode if no taskId is provided', () => {
-    expect(component.isEditMode).toBe(false);
-  });
-
-  it('should initialize in edit mode if taskId is provided', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('1');
-    mockAuthService.getLista.and.returnValue(of([mockTask]));
-
+  it('should initialize in add mode', () => {
     component.ngOnInit();
-
-    expect(component.isEditMode).toBe(true);
-    expect(component.task).toEqual(mockTask);
-  });
-
-  it('should handle task not found scenario in edit mode', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('999');
-    mockAuthService.getLista.and.returnValue(of([]));
-
-    component.ngOnInit();
-
-    expect(component.task.name).toBe('');
-  });
-
-  it('should save a new task', () => {
-    const taskList = [{ id:' 1', name: 'Existing Task', updatedBy: 'User', updateDate: new Date(), endDate: new Date(), status: 'Em andamento' }];
-    mockAuthService.getLista.and.returnValue(of(taskList));
-    mockAuthService.adicionarLista.and.returnValue(of(mockTask));
-
-    component.onSubmit();
-
-    expect(mockAuthService.adicionarLista).toHaveBeenCalled();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/task']);
-  });
-
-  it('should edit an existing task', () => {
-    component.isEditMode = true;
-    mockAuthService.editarTarefa.and.returnValue(of(mockTask));
-
-    component.onSubmit();
-
-    expect(mockAuthService.editarTarefa).toHaveBeenCalledWith(component.task);
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/task']);
-  });
-
-  it('should show error message on save task failure', () => {
-    mockAuthService.adicionarLista.and.returnValue(throwError(() => new Error('Save failed')));
-
-    component.onSubmit();
-
-    expect(mockSnackBar.open).toHaveBeenCalledWith('Erro ao criar a tarefa: Save failed', 'Fechar', {
-      duration: 3000,
-      verticalPosition: 'top',
-      horizontalPosition: 'center'
+    expect(component.isEditMode).toBeFalse();
+    expect(component.task).toEqual({
+      id: '',
+      name: '',
+      updatedBy: '',
+      updateDate: new Date(),
+      endDate: new Date(),
+      status: ''
     });
   });
 
-  it('should navigate to /task on cancel', () => {
-    component.onCancel();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/task']);
+  it('should initialize in edit mode with existing task', () => {
+    const mockTask: ListaInterface = {
+      id: '1',
+      name: 'Test Task',
+      updatedBy: 'User',
+      updateDate: new Date(),
+      endDate: new Date(),
+      status: 'Em andamento'
+    };
+
+    authServiceStub.getLista = () => of([mockTask]);
+    TestBed.overrideProvider(ActivatedRoute, {
+      useValue: {
+        snapshot: {
+          paramMap: {
+            get: () => '1'
+          }
+        }
+      }
+    });
+
+    component.ngOnInit();
+    expect(component.isEditMode).toBeTrue();
+    expect(component.task).toEqual(mockTask);
   });
 
-  it('should show error messages if form fields are empty on submit', () => {
-    component.task = { id: '0', name: '', updatedBy: '', updateDate: new Date(), endDate: new Date(), status: '' };
-    component.onSubmit();
+  it('should save a new task', () => {
+    const saveTaskSpy = spyOn<any>(component, 'saveTask').and.callThrough();
+    component.task = {
+      id: '',
+      name: 'New Task',
+      updatedBy: 'User',
+      updateDate: new Date(),
+      endDate: new Date(),
+      status: 'Em andamento'
+    };
 
-    expect(mockAuthService.adicionarLista).not.toHaveBeenCalled();
-    expect(mockAuthService.editarTarefa).not.toHaveBeenCalled();
+    component.onSubmit();
+    expect(saveTaskSpy).toHaveBeenCalled();
+    expect(routerStub.navigate).toHaveBeenCalledWith(['/task']);
+    expect(snackBarStub.open).toHaveBeenCalledWith('Tarefa criada com sucesso!', 'Fechar', { duration: 3000, verticalPosition: 'top', horizontalPosition: 'center' });
+  });
+
+  it('should save an edited task', () => {
+    component.isEditMode = true;
+    const saveTaskSpy = spyOn<any>(component, 'saveTask').and.callThrough();
+    component.task = {
+      id: '1',
+      name: 'Updated Task',
+      updatedBy: 'User',
+      updateDate: new Date(),
+      endDate: new Date(),
+      status: 'Concluida'
+    };
+
+    component.onSubmit();
+    expect(saveTaskSpy).toHaveBeenCalled();
+    expect(routerStub.navigate).toHaveBeenCalledWith(['/task']);
+    expect(snackBarStub.open).toHaveBeenCalledWith('Tarefa editada com sucesso!', 'Fechar', { duration: 3000, verticalPosition: 'top', horizontalPosition: 'center' });
+  });
+
+
+  it('should not save task if required fields are missing', () => {
+    component.task = { id: '', name: '', updatedBy: '', updateDate: new Date(), endDate: new Date(), status: '' };
+    component.onSubmit();
+    expect(routerStub.navigate).not.toHaveBeenCalled();
+    expect(snackBarStub.open).not.toHaveBeenCalled();
+  });
+
+  it('should show snackbar on error when editing a task', () => {
+    component.isEditMode = true;
+    authServiceStub.editarTarefa = () => throwError(() => new Error('Erro ao editar'));
+    component.task = {
+      id: '1',
+      name: 'Updated Task',
+      updatedBy: 'User',
+      updateDate: new Date(),
+      endDate: new Date(),
+      status: 'Concluida'
+    };
+
+    component.onSubmit();
+    expect(snackBarStub.open).toHaveBeenCalledWith('Erro ao editar a tarefa: Error: Erro ao editar', 'Fechar', { duration: 3000, verticalPosition: 'top', horizontalPosition: 'center' });
+  });
+
+  it('should show snackbar on error when adding a task', () => {
+    authServiceStub.adicionarLista = () => throwError(() => new Error('Erro ao adicionar'));
+    component.task = {
+      id: '',
+      name: 'New Task',
+      updatedBy: 'User',
+      updateDate: new Date(),
+      endDate: new Date(),
+      status: 'Em andamento'
+    };
+
+    component.onSubmit();
+    expect(snackBarStub.open).toHaveBeenCalledWith('Erro ao criar a tarefa: Error: Erro ao adicionar', 'Fechar', { duration: 3000, verticalPosition: 'top', horizontalPosition: 'center' });
+  });
+
+  it('should cancel and navigate back to task list', () => {
+    component.onCancel();
+    expect(routerStub.navigate).toHaveBeenCalledWith(['/task']);
   });
 });

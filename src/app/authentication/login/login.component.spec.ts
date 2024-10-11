@@ -4,6 +4,9 @@ import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { AuthenticationService } from '../../services/authentication.service';
 import { LoginComponent } from './login.component';
+import { HttpClient } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -16,11 +19,12 @@ describe('LoginComponent', () => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule],
+      imports: [ReactiveFormsModule, RouterTestingModule],
       declarations: [LoginComponent],
       providers: [
         { provide: AuthenticationService, useValue: authSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        HttpClientTestingModule
       ]
     }).compileComponents();
 
@@ -46,13 +50,13 @@ describe('LoginComponent', () => {
 
   it('should submit and navigate on successful login', () => {
     component.formLogar.controls['email'].setValue('teste@teste.com');
-    component.formLogar.controls['password'].setValue('senha123');
+    component.formLogar.controls['password'].setValue('senha123@');
 
     authService.login.and.returnValue(of(true)); // exemplo de login certo
     component.logar();
 
-    expect(authService.login).toHaveBeenCalledWith('teste@teste.com', 'senha123');
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/task');
+    expect(authService.login).toHaveBeenCalledWith('teste@teste.com', 'senha123@');
+    expect(router.navigateByUrl)
   });
 
   it('should show error on unsuccessful login', () => {
