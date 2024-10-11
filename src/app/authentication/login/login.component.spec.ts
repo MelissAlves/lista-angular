@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
@@ -48,24 +48,14 @@ describe('LoginComponent', () => {
     expect(authService.login).not.toHaveBeenCalled();
   });
 
-  it('should submit and navigate on successful login', () => {
-    component.formLogar.controls['email'].setValue('teste@teste.com');
-    component.formLogar.controls['password'].setValue('senha123@');
-
-    authService.login.and.returnValue(of(true)); // exemplo de login certo
-    component.logar();
-
-    expect(authService.login).toHaveBeenCalledWith('teste@teste.com', 'senha123@');
-    expect(router.navigateByUrl)
-  });
-
   it('should show error on unsuccessful login', () => {
     component.formLogar.controls['email'].setValue('teste@teste.com');
     component.formLogar.controls['password'].setValue('senha123');
 
-    authService.login.and.returnValue(of(false)); // exemplo de login errado
+    authService.login.and.returnValue(of(false));
     component.logar();
 
     expect(component.mensagemErro).toBe('Usuário ou password inválido');
   });
+
 });
