@@ -12,7 +12,7 @@ describe('ModalComponent', () => {
 
     await TestBed.configureTestingModule({
       declarations: [ModalComponent],
-      imports: [MatDialogModule], // Importa o MatDialogModule
+      imports: [MatDialogModule],
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { name: 'Teste' } }

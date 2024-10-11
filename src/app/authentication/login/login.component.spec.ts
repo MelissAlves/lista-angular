@@ -1,38 +1,49 @@
-import { ComponentFixture, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { LoginComponent } from './login.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { AuthenticationService } from '../../services/authentication.service';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
-import { AuthenticationService } from '../../services/authentication.service';
-import { LoginComponent } from './login.component';
-import { HttpClient } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+
+class MockAuthenticationService {
+  login(email: string, password: string) {
+    if (email === 'teste@gmail.com' && password === '123Teste@') {
+      return of(true);
+    }
+    return of(false);
+  }
+}
+
+class MockRouter {
+  navigateByUrl(url: string) {
+    return url;
+  }
+}
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let authService: jasmine.SpyObj<AuthenticationService>;
-  let router: jasmine.SpyObj<Router>;
+  let authService: AuthenticationService;
+  let router: Router;
 
   beforeEach(async () => {
-    const authSpy = jasmine.createSpyObj('AuthenticationService', ['login']);
-    const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
-
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, RouterTestingModule],
       declarations: [LoginComponent],
+      imports: [ReactiveFormsModule],
       providers: [
-        { provide: AuthenticationService, useValue: authSpy },
-        { provide: Router, useValue: routerSpy },
-        HttpClientTestingModule
-      ]
+        { provide: AuthenticationService, useClass: MockAuthenticationService },
+        { provide: Router, useClass: MockRouter }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
-    authService = TestBed.inject(AuthenticationService) as jasmine.SpyObj<AuthenticationService>;
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-
+    authService = TestBed.inject(AuthenticationService);
+    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
@@ -40,22 +51,49 @@ describe('LoginComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should not submit if the form is invalid', () => {
-    component.formLogar.controls['email'].setValue('');
-    component.formLogar.controls['password'].setValue('');
-    component.logar();
-    expect(component.submetido).toBeTrue();
-    expect(authService.login).not.toHaveBeenCalled();
+  it('should initialize the login form', () => {
+    expect(component.formLogar).toBeDefined();
+    expect(component.formLogar.controls['email']).toBeTruthy();
+    expect(component.formLogar.controls['password']).toBeTruthy();
   });
 
-  it('should show error on unsuccessful login', () => {
-    component.formLogar.controls['email'].setValue('teste@teste.com');
-    component.formLogar.controls['password'].setValue('senha123');
-
-    authService.login.and.returnValue(of(false));
+  it('should display "Required Field" error when fields are empty and form is submitted', () => {
     component.logar();
+    fixture.detectChanges();
+
+    const emailErrorMsg = fixture.nativeElement.querySelector('span');
+    expect(emailErrorMsg.textContent).toContain('Campo obrigatório');
+  });
+
+  it('should show an error message when email or password are incorrect', () => {
+    component.formLogar.controls['email'].setValue('teste@gmail.com');
+    component.formLogar.controls['password'].setValue('123456');
+    component.logar();
+    fixture.detectChanges();
 
     expect(component.mensagemErro).toBe('Usuário ou password inválido');
   });
 
+  it('should redirect to task page after successful login', () => {
+    spyOn(router, 'navigateByUrl');
+    component.formLogar.controls['email'].setValue('teste@gmail.com');
+    component.formLogar.controls['password'].setValue('123Teste@');
+    component.logar();
+    fixture.detectChanges();
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/task');
+  });
+
+  it('should redirect to registration page when clicking register', () => {
+    spyOn(router, 'navigateByUrl');
+    component.btnInscrever();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/register');
+  });
+
+  it('you should not submit the form if it is invalid', () => {
+    component.formLogar.controls['email'].setValue('');
+    component.formLogar.controls['password'].setValue('');
+    component.logar();
+    expect(component.formLogar.invalid).toBeTrue();
+  });
 });

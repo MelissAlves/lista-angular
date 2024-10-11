@@ -20,7 +20,7 @@ export class AuthenticationService {
     return this.http.get<Login[]>(`${this.apLogin}?email=${email}`).pipe(
       map((resposta: Login[]) => {
         if (resposta.length && resposta[0].password === password) {
-          // Token gerado e armazenando token e name no sessionStorage
+          // armazenando token e name no sessionStorage
           const token = Math.random().toString(36).substring(2);
           sessionStorage.setItem('auth-token', token);
           sessionStorage.setItem('user-name', resposta[0].name);

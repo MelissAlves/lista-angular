@@ -8,7 +8,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { TaskListComponent } from './task-list.component';
-import { ListaInterface } from '../../models/lista-tarefa';
 import { ModalComponent } from '../../components/modal/modal.component';
 
 class MockAuthService {
@@ -24,7 +23,7 @@ class MockAuthService {
 class MockMatDialog {
   open() {
     return {
-      afterClosed: () => of(true) // Mock para o diálogo que retorna true após fechado
+      afterClosed: () => of(true)
     };
   }
 }
@@ -42,7 +41,6 @@ describe('TaskListComponent', () => {
   let router: Router;
 
   beforeEach(async () => {
-    // Mova a substituição do provedor aqui
     TestBed.overrideProvider(AuthService, { useValue: new MockAuthService() });
 
     await TestBed.configureTestingModule({
@@ -57,7 +55,7 @@ describe('TaskListComponent', () => {
 
     fixture = TestBed.createComponent(TaskListComponent);
     component = fixture.componentInstance;
-    authService = TestBed.inject(AuthService); // Agora deve funcionar
+    authService = TestBed.inject(AuthService);
     dialog = TestBed.inject(MatDialog);
     snackBar = TestBed.inject(MatSnackBar);
     router = TestBed.inject(Router);
